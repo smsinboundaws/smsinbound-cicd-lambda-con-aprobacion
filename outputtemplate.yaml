@@ -1,0 +1,10 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A simple Lambda function saying "Hello World desde codebuilld modificado".
+Resources:
+  HelloWorld:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.serverless.demo.function.HelloWorld
+      Runtime: java8
+      CodeUri: s3://smsinboundbk/17795d89d898af976c004ed40b53c75d

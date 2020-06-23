@@ -1,0 +1,24 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      java: openjdk8
+  pre_build:
+    commands:
+      - echo Test started on `date`
+      - mvn clean compile test
+  build:
+    commands:
+      - echo Build started on `date`
+      - export BUCKET=smsinboundbk
+      - mvn package
+      - aws cloudformation package --template-file template.yaml --s3-bucket $BUCKET --output-template-file outputtemplate.yaml
+      - aws cloudformation deploy --template-file outputtemplate.yaml --stack-name helloworld-codebuild-stack --capabilities CAPABILITY_IAM
+  post_build:
+    commands:
+      - echo Build completed on `date` !!!
+artifacts:
+  files:
+    - target/democonaprobacion-1.0.0-shaded.jar
+    - template.yaml
+    - outputtemplate.yaml
