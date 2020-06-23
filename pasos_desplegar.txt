@@ -1,0 +1,30 @@
+Pasos a seguir para el despliegue de una lambda con cloudformation
+1) Crear un role "CloudFormationSMSIBRole" en IAM bajo el servicio cloudformation que es donde se va a usar
+2) A ese rol le vamos asignar el permiso de Execute Lambda y
+  le ponemos como nombre CloudFormationSMSIBRole
+3) Una vez creado ese rol le asigmos politicas en "add inline policy" de permisos del json
+que se llama CloudFormationPolicy.json (este json es un ejemplo que saque de la web y 
+hay que cambiar la cuenta y la region). Y le damos un nombre a la politica cread
+"CFLambdapolicy"
+4) Crear el pipeline "SMSInbound-cicd-con-aprob", y dejar el rol por defecto para el pipeline.
+5) Elegir como repositorio github
+6) Crear un proyecto para compilar, en este caso use codeBuild
+  6.1 En mi caso cree SMSIB-BuildProject-Con-Aprob
+  6.2 Seleccino la imagen por defecto codeBuild, sistema operativo Ubuntu y version v2.
+  6.3 Va crear un role para el build y dejo el que crea por defecto "codebuild-SMSIB-BuildProject-Con-Aprob-service-role"
+  6.4 Aca te pide el builspec.yml, se deja el por defecto para que lo busque desde la raiz
+7) Como proveedor de deploy dejo CloudFormation
+  7.1 Action mode selecciono create o replace a change set
+  7.2 En Template -> BuildArtifact ahi hay que poner el nombre del template donde esta
+  la especificacion del template de cloudformation.
+  7.3 Crear un stack name SMSInboundConAprobSTACK
+  7.4 Crear un changeSet name en mi caso SMSInboundConAprobChangeSet
+  7.5 Capabilities se debe seleccionar CAPABILITY_IAM
+  7.6 En role se debe selecionar el creado en el punto 1), que es el permiso para crear los recursos en el stack
+ 8) Crear pipeline
+ 9) Se va a ejecutar el pipeline pero va a pinchar porque el build no tiene permiso para subir a S3
+ 10) Hay que darle permiso al rol creado en el punto 6.1 que permite acceder al s3
+    Desde IAM se busca ese rol, y en inline policy se busca el servicio S3 y se le da permisos
+    sobre el S3 al write -> putObject. Ahora despues cuando te pide los recursos especifique 
+    all resources pero ahi se deberia buscar el bucket especifico.
+    Y le puso como nombre a la policy "S3CodeBuildPolicyForSMSIBconAprob"

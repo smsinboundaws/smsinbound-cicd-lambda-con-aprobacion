@@ -13,7 +13,6 @@ phases:
       - export BUCKET=smsinboundbk
       - mvn package
       - aws cloudformation package --template-file template.yaml --s3-bucket $BUCKET --output-template-file outputtemplate.yaml
-      - aws cloudformation deploy --template-file outputtemplate.yaml --stack-name helloworld-codebuild-stack --capabilities CAPABILITY_IAM
   post_build:
     commands:
       - echo Build completed on `date` !!!
